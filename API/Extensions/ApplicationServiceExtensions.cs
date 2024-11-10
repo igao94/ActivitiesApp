@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.Activities;
+using Application.Core;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace API.Extensions;
@@ -13,8 +17,17 @@ public static class ApplicationServiceExtensions
 
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseSqlServer(config.GetConnectionString("DefaultValue"));
+            opt.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         });
+
+        services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(CreateActivity.Handler).Assembly));
+
+        services.AddFluentValidationAutoValidation();
+
+        services.AddValidatorsFromAssemblyContaining<CreateActivity>();
 
         return services;
     }
