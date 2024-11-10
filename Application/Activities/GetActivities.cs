@@ -1,6 +1,7 @@
 ﻿using Application.Activities.DTOs;
 using Application.Core;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -17,9 +18,11 @@ public class GetActivities
         public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken
             cancellationToken)
         {
-            var activities = await context.Activities.ToListAsync();
+            var activities = await context.Activities
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ToListAsync();
 
-            return Result<List<ActivityDto>>.Success(mapper.Map<List<ActivityDto>>(activities));
+            return Result<List<ActivityDto>>.Success(activities);
         }
     }
 }
