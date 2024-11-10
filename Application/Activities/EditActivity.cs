@@ -1,4 +1,5 @@
 ﻿using Application.Activities.DTOs;
+using Application.Core;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -8,7 +9,7 @@ namespace Application.Activities;
 
 public class EditActivity
 {
-    public class Command(EditActivityDto editActivityDto) : IRequest
+    public class Command(EditActivityDto editActivityDto) : IRequest<Result<Unit>>
     {
         public EditActivityDto EditActivityDto { get; set; } = editActivityDto;
     }
@@ -27,15 +28,21 @@ public class EditActivity
     }
 
     public class Handler(DataContext context,
-        IMapper mapper) : IRequestHandler<Command>
+        IMapper mapper) : IRequestHandler<Command, Result<Unit>?>
     {
-        public async Task Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Unit>?> Handle(Command request, CancellationToken cancellationToken)
         {
             var activity = await context.Activities.FindAsync(request.EditActivityDto.Id);
 
+            if (activity is null) return null;
+
             mapper.Map(request.EditActivityDto, activity);
 
-            await context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync() > 0;
+
+            return result
+                ? Result<Unit>.Success(Unit.Value)
+                : Result<Unit>.Failure("Failed to update an activity.");
         }
     }
 }

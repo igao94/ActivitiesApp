@@ -1,4 +1,5 @@
 ﻿using Application.Activities.DTOs;
+using Application.Core;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +9,17 @@ namespace Application.Activities;
 
 public class GetActivities
 {
-    public class Query : IRequest<List<ActivityDto>> { }
+    public class Query : IRequest<Result<List<ActivityDto>>> { }
 
     public class Handler(DataContext context,
-        IMapper mapper) : IRequestHandler<Query, List<ActivityDto>>
+        IMapper mapper) : IRequestHandler<Query, Result<List<ActivityDto>>>
     {
-        public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken
+            cancellationToken)
         {
             var activities = await context.Activities.ToListAsync();
 
-            return mapper.Map<List<ActivityDto>>(activities);
+            return Result<List<ActivityDto>>.Success(mapper.Map<List<ActivityDto>>(activities));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Activities.DTOs;
+using Application.Core;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
@@ -9,7 +10,7 @@ namespace Application.Activities;
 
 public class CreateActivity
 {
-    public class Command(CreateActivityDto createActivityDto) : IRequest<ActivityDto>
+    public class Command(CreateActivityDto createActivityDto) : IRequest<Result<ActivityDto>>
     {
         public CreateActivityDto CreateActivityDto { get; set; } = createActivityDto;
     }
@@ -28,17 +29,20 @@ public class CreateActivity
     }
 
     public class Handler(DataContext context,
-        IMapper mapper) : IRequestHandler<Command, ActivityDto>
+        IMapper mapper) : IRequestHandler<Command, Result<ActivityDto>>
     {
-        public async Task<ActivityDto> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<ActivityDto>> Handle(Command request,
+            CancellationToken cancellationToken)
         {
             var activity = mapper.Map<Activity>(request.CreateActivityDto);
 
             context.Activities.Add(activity);
 
-            await context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync() > 0;
 
-            return mapper.Map<ActivityDto>(activity);
+            return result
+                ? Result<ActivityDto>.Success(mapper.Map<ActivityDto>(activity))
+                : Result<ActivityDto>.Failure("Failed to create an activity.");
         }
     }
 }
