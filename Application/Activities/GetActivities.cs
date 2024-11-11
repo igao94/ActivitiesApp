@@ -1,5 +1,6 @@
 ﻿using Application.Activities.DTOs;
 using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
@@ -13,13 +14,15 @@ public class GetActivities
     public class Query : IRequest<Result<List<ActivityDto>>> { }
 
     public class Handler(DataContext context,
+        IUserAccesor userAccesor,
         IMapper mapper) : IRequestHandler<Query, Result<List<ActivityDto>>>
     {
         public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken
             cancellationToken)
         {
             var activities = await context.Activities
-                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider)
+                .ProjectTo<ActivityDto>(mapper.ConfigurationProvider,
+                    new { currentUsername = userAccesor.GetUsername() })
                 .ToListAsync();
 
             return Result<List<ActivityDto>>.Success(activities);
