@@ -43,6 +43,7 @@ public class AccountController(UserManager<AppUser> userManager,
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
         var user = await userManager.Users
+            .Include(u => u.Photos)
             .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
         if (user is null) return Unauthorized();
@@ -59,6 +60,7 @@ public class AccountController(UserManager<AppUser> userManager,
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
         var user = await userManager.Users
+            .Include(u => u.Photos)
             .FirstOrDefaultAsync(u => u.UserName == User.FindFirstValue(ClaimTypes.Name));
 
         if (user is null) return NotFound();
@@ -73,7 +75,7 @@ public class AccountController(UserManager<AppUser> userManager,
             Username = user.DisplayName,
             DisplayName = user.DisplayName,
             Token = tokenService.CreateToken(user),
-            Image = null
+            Image = user.Photos?.FirstOrDefault(p => p.IsMain)?.Url
         };
     }
 }

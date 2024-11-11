@@ -3,6 +3,7 @@ using Application.Core;
 using Application.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -34,6 +35,10 @@ public static class ApplicationServiceExtensions
         services.AddHttpContextAccessor();
 
         services.AddScoped<IUserAccesor, UserAccessor>();
+
+        services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+
+        services.AddScoped<IPhotoAccessor, PhotoAccessor>();
 
         return services;
     }
