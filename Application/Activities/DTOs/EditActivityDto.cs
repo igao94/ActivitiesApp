@@ -4,7 +4,7 @@ namespace Application.Activities.DTOs;
 
 public class EditActivityDto
 {
-    [JsonInclude]
+    [JsonIgnore]
     public Guid Id {  get; set; }
     public required string Title { get; set; }
     public DateTime Date { get; set; }

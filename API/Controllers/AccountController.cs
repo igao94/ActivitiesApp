@@ -55,7 +55,6 @@ public class AccountController(UserManager<AppUser> userManager,
         return Ok(CreateUserObject(user));
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
@@ -72,7 +71,7 @@ public class AccountController(UserManager<AppUser> userManager,
     {
         return new UserDto
         {
-            Username = user.DisplayName,
+            Username = user.UserName!,
             DisplayName = user.DisplayName,
             Token = tokenService.CreateToken(user),
             Image = user.Photos?.FirstOrDefault(p => p.IsMain)?.Url
