@@ -10,20 +10,19 @@ namespace API.Controllers;
 public class ActivitiesController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<List<ActivityDto>>> GetActivites
-        ([FromQuery] ActivityParams activityParams)
+    public async Task<IActionResult> GetActivites([FromQuery] ActivityParams activityParams)
     {
         return HandlePagedResult(await mediator.Send(new GetActivities.Query(activityParams)));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ActivityDto>> GetActivity(Guid id)
+    public async Task<IActionResult>GetActivity(Guid id)
     {
         return HandleResult(await mediator.Send(new GetActivity.Query(id)));
     }
 
     [HttpPost]
-    public async Task<ActionResult<ActivityDto>> CreateActivity(CreateActivityDto createActivityDto)
+    public async Task<IActionResult> CreateActivity(CreateActivityDto createActivityDto)
     {
         return HandleResult(await mediator.Send(new CreateActivity.Command(createActivityDto)));
     }

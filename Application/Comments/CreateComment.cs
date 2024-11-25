@@ -2,7 +2,6 @@
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
-using Azure;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
